@@ -1,0 +1,5 @@
+ipykernel
+python-dotenv
+openai
+pydantic
+pydantic-settings

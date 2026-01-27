@@ -22,6 +22,19 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+.pdm-build/
+
+# Poetry / UV
+poetry.lock
+uv.lock
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -58,6 +71,7 @@ target/
 
 # DotEnv configuration
 .env
+.env.*
 
 # Database
 *.db
