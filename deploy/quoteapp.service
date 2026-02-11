@@ -1,0 +1,25 @@
+[Unit]
+Description=Breslow QuoteApp API (FastAPI + Uvicorn)
+After=network.target
+
+[Service]
+Type=simple
+User=quoteapp
+Group=quoteapp
+WorkingDirectory=/opt/quoteapp/repo
+EnvironmentFile=/opt/quoteapp/.env
+ExecStart=/opt/quoteapp/venv/bin/uvicorn src.app.main:app --host 127.0.0.1 --port 8000
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/quoteapp/data
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
