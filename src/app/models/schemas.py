@@ -77,6 +77,8 @@ class ExternalAPIResponse(BaseModel):
     response: Optional[dict[str, Any]] = None
     metadata: Optional[dict[str, Any]] = None
     created_at: str
+    gate_number: Optional[int] = None
+    gate_name: Optional[str] = None
 
 
 # ── SSE Event Data ──────────────────────────────────────────────────
@@ -94,3 +96,5 @@ class StreamDoneData(BaseModel):
     content: str
     response: Optional[dict[str, Any]] = None
     metadata: Optional[dict[str, Any]] = None
+    gate_number: Optional[int] = None
+    gate_name: Optional[str] = None

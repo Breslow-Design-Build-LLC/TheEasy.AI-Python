@@ -1,31 +1,13 @@
-"""Quote orchestrator: decides which prompt step to use, parses responses."""
+"""Quote orchestrator: resolves gates, calls OpenAI, manages advancement."""
 
 from __future__ import annotations
 
 import json
-from typing import Any, AsyncGenerator, Optional
+from typing import Any, AsyncGenerator
 
-from ..config import settings
 from . import conversation_service as conv_svc
 from . import openai_service
-
-
-def _pick_prompt(
-    conversation_history: list[dict[str, str]],
-) -> tuple[str, dict[str, str] | None, str | None]:
-    """Choose the correct prompt ID, variables, and version based on conversation state.
-
-    - First user message -> Step 1 (product selection) with product_options variable + version
-    - Subsequent messages -> Step 2 (detailed quoting), no version (matches Step2.py)
-    """
-    user_messages = [m for m in conversation_history if m["role"] == "user"]
-    if len(user_messages) <= 1:
-        return (
-            settings.openai_prompt_id_step1,
-            {"product_options": settings.product_options},
-            settings.openai_prompt_version,
-        )
-    return settings.openai_prompt_id_step2, {}, None
+from .orchestrator import orchestrator
 
 
 def _parse_response_text(text: str) -> dict[str, Any] | None:
@@ -45,23 +27,35 @@ async def handle_message(
     # Store user message
     await conv_svc.add_message(conversation_id, "user", user_message)
 
-    # Build history & pick prompt
-    history = await conv_svc.get_conversation_history(conversation_id)
-    prompt_id, variables, version = _pick_prompt(history)
+    # Resolve current gate
+    gate, session = await orchestrator.resolve_gate(conversation_id)
+    variables = orchestrator.resolve_variables(gate, session)
 
-    # Call OpenAI
+    # Build history & call OpenAI
+    history = await conv_svc.get_conversation_history(conversation_id)
     response_text = await openai_service.call_prompt(
-        prompt_id=prompt_id,
+        prompt_id=gate.prompt_id,
         messages=history,
-        variables=variables,
-        version=version,
+        variables=variables or None,
+        version=gate.prompt_version,
     )
 
     # Parse
     parsed = _parse_response_text(response_text)
-    metadata = {"prompt_id": prompt_id}
+    metadata: dict[str, Any] = {
+        "prompt_id": gate.prompt_id,
+        "gate_number": gate.number,
+        "gate_name": gate.name,
+    }
     if parsed and isinstance(parsed, dict):
         metadata["parsed_status"] = parsed.get("status")
+
+    # Check advancement
+    if orchestrator.should_advance(parsed):
+        new_gate = await orchestrator.advance_gate(conversation_id, session)
+        metadata["advanced_to_gate"] = new_gate
+    else:
+        await orchestrator.save_session(conversation_id, session)
 
     # Store assistant message
     msg = await conv_svc.add_message(
@@ -83,26 +77,40 @@ async def handle_message_stream(
     # Store user message
     await conv_svc.add_message(conversation_id, "user", user_message)
 
-    # Build history & pick prompt
+    # Resolve current gate
+    gate, session = await orchestrator.resolve_gate(conversation_id)
+    variables = orchestrator.resolve_variables(gate, session)
+
+    # Build history
     history = await conv_svc.get_conversation_history(conversation_id)
-    prompt_id, variables, version = _pick_prompt(history)
 
     chunks: list[str] = []
 
     async for delta in openai_service.stream_prompt(
-        prompt_id=prompt_id,
+        prompt_id=gate.prompt_id,
         messages=history,
-        variables=variables,
-        version=version,
+        variables=variables or None,
+        version=gate.prompt_version,
     ):
         chunks.append(delta)
         yield {"type": "chunk", "delta": delta}
 
     full_text = "".join(chunks).strip()
     parsed = _parse_response_text(full_text)
-    metadata = {"prompt_id": prompt_id}
+    metadata: dict[str, Any] = {
+        "prompt_id": gate.prompt_id,
+        "gate_number": gate.number,
+        "gate_name": gate.name,
+    }
     if parsed and isinstance(parsed, dict):
         metadata["parsed_status"] = parsed.get("status")
+
+    # Check advancement
+    if orchestrator.should_advance(parsed):
+        new_gate = await orchestrator.advance_gate(conversation_id, session)
+        metadata["advanced_to_gate"] = new_gate
+    else:
+        await orchestrator.save_session(conversation_id, session)
 
     # Store assistant message
     msg = await conv_svc.add_message(

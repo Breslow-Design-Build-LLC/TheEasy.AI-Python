@@ -143,6 +143,35 @@ async def get_messages(
         return results
 
 
+async def get_session_state(conversation_id: str) -> dict[str, Any]:
+    """Read session state from the conversation's config_json column."""
+    async with get_db_connection() as db:
+        cursor = await db.execute(
+            "SELECT config_json FROM conversations WHERE id = ?",
+            (conversation_id,),
+        )
+        row = await cursor.fetchone()
+        if row is None:
+            return {}
+        raw = row["config_json"]
+        if not raw:
+            return {}
+        return json.loads(raw)
+
+
+async def update_session_state(
+    conversation_id: str, state_dict: dict[str, Any]
+) -> None:
+    """Write session state back to the conversation's config_json column."""
+    now = datetime.now(timezone.utc).isoformat()
+    async with get_db_connection() as db:
+        await db.execute(
+            "UPDATE conversations SET config_json = ?, updated_at = ? WHERE id = ?",
+            (json.dumps(state_dict), now, conversation_id),
+        )
+        await db.commit()
+
+
 async def get_conversation_history(conversation_id: str) -> list[dict[str, str]]:
     """Return messages in OpenAI chat format [{role, content}, ...]."""
     async with get_db_connection() as db:

@@ -20,6 +20,7 @@ response = client.responses.create(
                 C) K-Bana
                 D) X-Blast
                 E) Sky-Tilt
+                F) New Product
             """,
 
             #"type3": "R-Breeze",

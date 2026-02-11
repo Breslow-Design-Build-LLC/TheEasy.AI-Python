@@ -54,14 +54,17 @@ async def send_message(conversation_id: str, body: SendMessageRequest):
             detail={"error": {"code": "openai_error", "message": str(exc)}},
         )
 
+    meta = msg.get("metadata") or {}
     return ExternalAPIResponse(
         conversation_id=conversation_id,
         message_id=msg["id"],
         role=msg["role"],
         content=msg["content"],
         response=msg.get("response"),
-        metadata=msg.get("metadata"),
+        metadata=meta,
         created_at=msg["created_at"],
+        gate_number=meta.get("gate_number"),
+        gate_name=meta.get("gate_name"),
     )
 
 
@@ -111,12 +114,15 @@ async def send_message_stream(conversation_id: str, body: SendMessageRequest):
                     yield {"event": "chunk", "data": data.model_dump_json()}
                 elif event["type"] == "done":
                     msg = event["message"]
+                    meta = msg.get("metadata") or {}
                     data = StreamDoneData(
                         conversation_id=conversation_id,
                         message_id=msg["id"],
                         content=msg["content"],
                         response=msg.get("response"),
-                        metadata=msg.get("metadata"),
+                        metadata=meta,
+                        gate_number=meta.get("gate_number"),
+                        gate_name=meta.get("gate_name"),
                     )
                     yield {"event": "done", "data": data.model_dump_json()}
         except Exception as exc:
