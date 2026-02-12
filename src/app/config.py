@@ -38,6 +38,104 @@ class AppSettings(BaseSettings):
             "OPENAI_PROMPT_ID_STEP2",
         ),
     )
+    openai_prompt_id_gate3: str = Field(
+        default="pmpt_6977ec1719a4819591ee668f88df17b909afc5ba96494ebe",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate3",
+            "OPENAI_PROMPT_ID_GATE3",
+        ),
+    )
+    openai_prompt_id_gate4: str = Field(
+        default="pmpt_6977f448f57881939b6410f0541e5303004454c08c8bc19e",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate4",
+            "OPENAI_PROMPT_ID_GATE4",
+        ),
+    )
+    openai_prompt_id_gate5: str = Field(
+        default="pmpt_6977f7ad484c819795d265ad1bf07b930402ff510a9eb765",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate5",
+            "OPENAI_PROMPT_ID_GATE5",
+        ),
+    )
+    openai_prompt_id_gate6: str = Field(
+        default="pmpt_697803e1e5e0819587867faccf71fa6409cf1cc966d5e321",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate6",
+            "OPENAI_PROMPT_ID_GATE6",
+        ),
+    )
+    openai_prompt_id_gate7: str = Field(
+        default="pmpt_697805fb59588196a446eb48e392548109820f5362547ca4",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate7",
+            "OPENAI_PROMPT_ID_GATE7",
+        ),
+    )
+    openai_prompt_id_gate8: str = Field(
+        default="pmpt_6978071466bc8190a15ee761a83398410b726c8acef309cc",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate8",
+            "OPENAI_PROMPT_ID_GATE8",
+        ),
+    )
+    openai_prompt_id_gate9: str = Field(
+        default="pmpt_697807cb96fc8194b82b82fce26f21bf09a1fc92e4563c30",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate9",
+            "OPENAI_PROMPT_ID_GATE9",
+        ),
+    )
+    openai_prompt_id_gate10: str = Field(
+        default="pmpt_6978092468cc81958ff5aae5ad2b5b9c0b95329c9d220ede",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate10",
+            "OPENAI_PROMPT_ID_GATE10",
+        ),
+    )
+    openai_prompt_id_gate11: str = Field(
+        default="pmpt_697809f6c66081958a4aacfe7e704d3f02d00efa02c8f61b",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate11",
+            "OPENAI_PROMPT_ID_GATE11",
+        ),
+    )
+    openai_prompt_id_gate12: str = Field(
+        default="pmpt_69780a90ce6881969d905471a1ad83a505416370ca27f5bb",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate12",
+            "OPENAI_PROMPT_ID_GATE12",
+        ),
+    )
+    openai_prompt_id_gate13: str = Field(
+        default="pmpt_69780bc3d80c819396ff8278323c3193080e758869de286b",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate13",
+            "OPENAI_PROMPT_ID_GATE13",
+        ),
+    )
+    openai_prompt_id_gate14: str = Field(
+        default="pmpt_6978110a94ec8194b17002c5ade3afd70bacd06984cffa57",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate14",
+            "OPENAI_PROMPT_ID_GATE14",
+        ),
+    )
+    openai_prompt_id_gate15: str = Field(
+        default="pmpt_697811b7f65881958e5a4f89b62b705f04088f60550ae728",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate15",
+            "OPENAI_PROMPT_ID_GATE15",
+        ),
+    )
+    openai_prompt_id_gate16: str = Field(
+        default="pmpt_6978126bfc1081909f6b9f79fb54a2c802d66271fdf751e6",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate16",
+            "OPENAI_PROMPT_ID_GATE16",
+        ),
+    )
     openai_prompt_version: str = "5"
 
     # CORS

@@ -53,12 +53,27 @@ class GateOrchestrator:
         if not parsed or not isinstance(parsed, dict):
             return False
         status = parsed.get("status", "").lower()
-        return status in ("ok", "complete", "done")
+        if status in ("ok", "complete", "done"):
+            return True
+        # Gate 1: product selected and no follow-up question
+        if parsed.get("product_id") and not parsed.get("question"):
+            return True
+        return False
+
+    def collect_data(self, session: SessionState, parsed: dict[str, Any]) -> None:
+        """Store relevant fields from a gate response into session.product_config."""
+        skip_keys = {"status", "question", "questions", "warnings"}
+        for key, value in parsed.items():
+            if key not in skip_keys and value is not None:
+                session.product_config[key] = value
 
     async def advance_gate(
-        self, conversation_id: str, session: SessionState
+        self, conversation_id: str, session: SessionState,
+        parsed: Optional[dict[str, Any]] = None,
     ) -> Optional[int]:
         """Advance to the next active gate and persist. Returns new gate number or None."""
+        if parsed and isinstance(parsed, dict):
+            self.collect_data(session, parsed)
         nxt = session.advance()
         await self.save_session(conversation_id, session)
         return nxt

@@ -52,8 +52,26 @@ async def handle_message(
 
     # Check advancement
     if orchestrator.should_advance(parsed):
-        new_gate = await orchestrator.advance_gate(conversation_id, session)
-        metadata["advanced_to_gate"] = new_gate
+        new_gate_num = await orchestrator.advance_gate(conversation_id, session, parsed)
+        metadata["advanced_to_gate"] = new_gate_num
+
+        # Auto-fetch the next gate's first question
+        if new_gate_num is not None:
+            next_gate, next_session = await orchestrator.resolve_gate(conversation_id)
+            next_variables = orchestrator.resolve_variables(next_gate, next_session)
+            next_history = await conv_svc.get_conversation_history(conversation_id)
+            next_response_text = await openai_service.call_prompt(
+                prompt_id=next_gate.prompt_id,
+                messages=next_history,
+                variables=next_variables or None,
+                version=next_gate.prompt_version,
+            )
+            next_parsed = _parse_response_text(next_response_text)
+            metadata["next_gate"] = {
+                "gate_number": next_gate.number,
+                "gate_name": next_gate.name,
+                "response": next_parsed or next_response_text,
+            }
     else:
         await orchestrator.save_session(conversation_id, session)
 
@@ -107,8 +125,26 @@ async def handle_message_stream(
 
     # Check advancement
     if orchestrator.should_advance(parsed):
-        new_gate = await orchestrator.advance_gate(conversation_id, session)
-        metadata["advanced_to_gate"] = new_gate
+        new_gate_num = await orchestrator.advance_gate(conversation_id, session, parsed)
+        metadata["advanced_to_gate"] = new_gate_num
+
+        # Auto-fetch the next gate's first question
+        if new_gate_num is not None:
+            next_gate, next_session = await orchestrator.resolve_gate(conversation_id)
+            next_variables = orchestrator.resolve_variables(next_gate, next_session)
+            next_history = await conv_svc.get_conversation_history(conversation_id)
+            next_response_text = await openai_service.call_prompt(
+                prompt_id=next_gate.prompt_id,
+                messages=next_history,
+                variables=next_variables or None,
+                version=next_gate.prompt_version,
+            )
+            next_parsed = _parse_response_text(next_response_text)
+            metadata["next_gate"] = {
+                "gate_number": next_gate.number,
+                "gate_name": next_gate.name,
+                "response": next_parsed or next_response_text,
+            }
     else:
         await orchestrator.save_session(conversation_id, session)
 
