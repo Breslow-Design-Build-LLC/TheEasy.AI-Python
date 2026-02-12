@@ -39,7 +39,7 @@ async def create_conversation(body: CreateConversationRequest):
 )
 async def cancel_conversation(
     conversation_id: str,
-    hard_delete: bool = Query(False, description="Delete (removes conversation + message from DB)"),
+    hard_delete: bool = Query(False, description="Removes conversation and messages from Database"),
 ):
     if hard_delete:
         result = await conv_svc.hard_delete_conversation(conversation_id)
