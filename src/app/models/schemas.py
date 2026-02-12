@@ -65,6 +65,7 @@ class MessageItem(BaseModel):
 
 
 class MessageListResponse(BaseModel):
+    conversation_status: str
     messages: list[MessageItem]
 
 

@@ -1,6 +1,6 @@
 """Conversation create / cancel endpoints."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from ..auth import require_bearer_token
 from ..models.schemas import (
@@ -32,12 +32,19 @@ async def create_conversation(body: CreateConversationRequest):
     return result
 
 
+
 @router.delete(
     "/{conversation_id}",
     response_model=CancelConversationResponse,
 )
-async def cancel_conversation(conversation_id: str):
-    result = await conv_svc.cancel_conversation(conversation_id)
+async def cancel_conversation(
+    conversation_id: str,
+    hard_delete: bool = Query(False, description="Delete (removes conversation + message from DB)"),
+):
+    if hard_delete:
+        result = await conv_svc.hard_delete_conversation(conversation_id)
+    else:
+        result = await conv_svc.cancel_conversation(conversation_id)
     if result is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

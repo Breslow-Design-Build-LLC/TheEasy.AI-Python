@@ -66,6 +66,24 @@ async def cancel_conversation(conversation_id: str) -> dict[str, Any] | None:
     return {"conversation_id": conversation_id, "status": "cancelled"}
 
 
+async def hard_delete_conversation(conversation_id: str) -> dict[str, Any] | None:
+    async with get_db_connection() as db:
+        cursor = await db.execute(
+            "SELECT id FROM conversations WHERE id = ?", (conversation_id,)
+        )
+        row = await cursor.fetchone()
+        if row is None:
+            return None
+        await db.execute(
+            "DELETE FROM messages WHERE conversation_id = ?", (conversation_id,)
+        )
+        await db.execute(
+            "DELETE FROM conversations WHERE id = ?", (conversation_id,)
+        )
+        await db.commit()
+    return {"conversation_id": conversation_id, "status": "deleted"}
+
+
 # ── Messages ────────────────────────────────────────────────────────
 
 

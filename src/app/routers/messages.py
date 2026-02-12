@@ -94,7 +94,7 @@ async def get_messages(
         )
         for r in rows
     ]
-    return MessageListResponse(messages=items)
+    return MessageListResponse(conversation_status=conv["status"], messages=items)
 
 
 @router.post("/stream", status_code=status.HTTP_200_OK)
