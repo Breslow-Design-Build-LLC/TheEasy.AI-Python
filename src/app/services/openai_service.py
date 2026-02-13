@@ -39,14 +39,15 @@ def _call_prompt_sync(
     """Synchronous call to OpenAI Prompts API. Returns the output text."""
     client = get_client()
     prompt_payload: dict[str, Any] = {"id": prompt_id}
-    if version:
-        prompt_payload["version"] = version
+    # if version:
+    #     prompt_payload["version"] = version
     prompt_payload["variables"] = variables or {}
 
     response = client.responses.create(
         prompt=prompt_payload,
         input=messages,
         stream=False,
+        store=True,
     )
     return response.output_text
 
@@ -78,8 +79,8 @@ def _stream_prompt_sync(
     """Synchronous generator that yields text deltas from OpenAI streaming."""
     client = get_client()
     prompt_payload: dict[str, Any] = {"id": prompt_id}
-    if version:
-        prompt_payload["version"] = version
+    # if version:
+    #     prompt_payload["version"] = version
     prompt_payload["variables"] = variables or {}
 
     stream = client.responses.create(

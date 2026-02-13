@@ -13,7 +13,7 @@ from .registry import GATE_REGISTRY
 class SessionState:
     current_gate: int = 1
     gate_sequence: list[int] = dataclasses.field(
-        default_factory=lambda: list(range(1, 17))
+        default_factory=lambda: [1, 2, 17, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
     )
     product_config: dict[str, Any] = dataclasses.field(default_factory=dict)
     line_items: list[dict] = dataclasses.field(default_factory=list)
@@ -29,7 +29,7 @@ class SessionState:
             return cls()
         return cls(
             current_gate=data.get("current_gate", 1),
-            gate_sequence=data.get("gate_sequence", list(range(1, 17))),
+            gate_sequence=data.get("gate_sequence", [1, 2, 17, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]),
             product_config=data.get("product_config", {}),
             line_items=data.get("line_items", []),
             subtotals_by_gate=data.get("subtotals_by_gate", {}),

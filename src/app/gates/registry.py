@@ -20,6 +20,9 @@ GATE_REGISTRY: dict[int, GateConfig] = {
         name="Dimensions & State",
         gate_type=GateType.UNIVERSAL,
         prompt_id=settings.openai_prompt_id_gate2,
+        variables_template={
+            "dimension_context": "dimension_context",
+        },
         status=GateStatus.ACTIVE,
     ),
     3: GateConfig(
@@ -27,11 +30,8 @@ GATE_REGISTRY: dict[int, GateConfig] = {
         name="Bay Logic & Pricing",
         gate_type=GateType.UNIVERSAL,
         prompt_id=settings.openai_prompt_id_gate3,
-        prompt_version="2",
         variables_template={
-            "product_options": "product_options",
-            "width_ft_rounded": "width_ft_rounded",
-            "length_ft_rounded": "length_ft_rounded",
+            "bay_logic_context": "bay_logic_context",
         },
         status=GateStatus.ACTIVE,
     ),
@@ -42,8 +42,7 @@ GATE_REGISTRY: dict[int, GateConfig] = {
         prompt_id=settings.openai_prompt_id_gate4,
         prompt_version="2",
         variables_template={
-            "product_options": "product_id",
-            "total_bays": "total_bays",
+            "bay_logic_context": "bay_logic_context",
         },
         status=GateStatus.ACTIVE,
     ),
@@ -194,9 +193,19 @@ GATE_REGISTRY: dict[int, GateConfig] = {
         },
         status=GateStatus.ACTIVE,
     ),
+    17: GateConfig(
+        number=17,
+        name="Orientation Confirmation",
+        gate_type=GateType.UNIVERSAL,
+        prompt_id=settings.openai_prompt_id_gate2b,
+        variables_template={
+            "orientation_context": "gate_2_response",
+        },
+        status=GateStatus.ACTIVE,
+    ),
 }
 
-DEFAULT_GATE_SEQUENCE: list[int] = list(range(1, 17))
+DEFAULT_GATE_SEQUENCE: list[int] = [1, 2, 17, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
 
 
 def get_gate(number: int) -> GateConfig:

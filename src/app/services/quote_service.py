@@ -57,21 +57,24 @@ async def handle_message(
 
         # Auto-fetch the next gate's first question
         if new_gate_num is not None:
-            next_gate, next_session = await orchestrator.resolve_gate(conversation_id)
-            next_variables = orchestrator.resolve_variables(next_gate, next_session)
-            next_history = await conv_svc.get_conversation_history(conversation_id)
-            next_response_text = await openai_service.call_prompt(
-                prompt_id=next_gate.prompt_id,
-                messages=next_history,
-                variables=next_variables or None,
-                version=next_gate.prompt_version,
-            )
-            next_parsed = _parse_response_text(next_response_text)
-            metadata["next_gate"] = {
-                "gate_number": next_gate.number,
-                "gate_name": next_gate.name,
-                "response": next_parsed or next_response_text,
-            }
+            try:
+                next_gate, next_session = await orchestrator.resolve_gate(conversation_id)
+                next_variables = orchestrator.resolve_variables(next_gate, next_session)
+                next_history = await conv_svc.get_conversation_history(conversation_id)
+                next_response_text = await openai_service.call_prompt(
+                    prompt_id=next_gate.prompt_id,
+                    messages=next_history,
+                    variables=next_variables or None,
+                    version=next_gate.prompt_version,
+                )
+                next_parsed = _parse_response_text(next_response_text)
+                metadata["next_gate"] = {
+                    "gate_number": next_gate.number,
+                    "gate_name": next_gate.name,
+                    "response": next_parsed or next_response_text,
+                }
+            except Exception as e:
+                metadata["next_gate_error"] = str(e)
     else:
         await orchestrator.save_session(conversation_id, session)
 
@@ -130,21 +133,24 @@ async def handle_message_stream(
 
         # Auto-fetch the next gate's first question
         if new_gate_num is not None:
-            next_gate, next_session = await orchestrator.resolve_gate(conversation_id)
-            next_variables = orchestrator.resolve_variables(next_gate, next_session)
-            next_history = await conv_svc.get_conversation_history(conversation_id)
-            next_response_text = await openai_service.call_prompt(
-                prompt_id=next_gate.prompt_id,
-                messages=next_history,
-                variables=next_variables or None,
-                version=next_gate.prompt_version,
-            )
-            next_parsed = _parse_response_text(next_response_text)
-            metadata["next_gate"] = {
-                "gate_number": next_gate.number,
-                "gate_name": next_gate.name,
-                "response": next_parsed or next_response_text,
-            }
+            try:
+                next_gate, next_session = await orchestrator.resolve_gate(conversation_id)
+                next_variables = orchestrator.resolve_variables(next_gate, next_session)
+                next_history = await conv_svc.get_conversation_history(conversation_id)
+                next_response_text = await openai_service.call_prompt(
+                    prompt_id=next_gate.prompt_id,
+                    messages=next_history,
+                    variables=next_variables or None,
+                    version=next_gate.prompt_version,
+                )
+                next_parsed = _parse_response_text(next_response_text)
+                metadata["next_gate"] = {
+                    "gate_number": next_gate.number,
+                    "gate_name": next_gate.name,
+                    "response": next_parsed or next_response_text,
+                }
+            except Exception as e:
+                metadata["next_gate_error"] = str(e)
     else:
         await orchestrator.save_session(conversation_id, session)
 

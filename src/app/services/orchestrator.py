@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any, Optional
 
 from ..config import settings
@@ -66,6 +67,33 @@ class GateOrchestrator:
         for key, value in parsed.items():
             if key not in skip_keys and value is not None:
                 session.product_config[key] = value
+        # Store full response as JSON string keyed by gate number
+        gate_key = f"gate_{session.current_gate}_response"
+        session.product_config[gate_key] = json.dumps(parsed)
+        # Build composite context variables for downstream gates
+        self._build_composite_contexts(session)
+
+    def _build_composite_contexts(self, session: SessionState) -> None:
+        """Build composite JSON context variables from collected gate data."""
+        pc = session.product_config
+
+        # bay_logic_context — needed by Gate 3 after Gate 17 (Orientation) completes
+        if "width_ft_confirmed" in pc and "length_ft_confirmed" in pc:
+            dim_rules = json.loads(settings.dimension_context)
+            r_blade = dim_rules.get("DIMENSION_RULES", {}).get("r_blade", {})
+            bay_logic = {
+                "PRODUCT_ID": pc.get("product_id", "r_blade"),
+                "MAX_BAY_WIDTH_FT": r_blade.get("max_width_single_bay_ft", 16),
+                "MAX_BAY_LENGTH_FT": r_blade.get("max_length_single_bay_ft", 23),
+                "INPUT_DIMENSIONS": {
+                    "comparison_mode": pc.get("comparison_mode", False),
+                    "width_ft": pc.get("width_ft_confirmed"),
+                    "length_ft": pc.get("length_ft_confirmed"),
+                    "option_keep": pc.get("option_keep", {}),
+                    "option_swap": pc.get("option_swap", {}),
+                },
+            }
+            pc["bay_logic_context"] = json.dumps(bay_logic)
 
     async def advance_gate(
         self, conversation_id: str, session: SessionState,

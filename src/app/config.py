@@ -30,7 +30,8 @@ class AppSettings(BaseSettings):
         ),
     )
     openai_prompt_id_gate2: str = Field(
-        default="pmpt_6977e7418e708193ba722b4422464f080876845b508020c9",
+        #default="pmpt_6977e7418e708193ba722b4422464f080876845b508020c9",
+        default="pmpt_698f24734b2c8190b35dbd645766daba0a00ac37516c9940",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate2",
             "OPENAI_PROMPT_ID_GATE2",
@@ -38,14 +39,22 @@ class AppSettings(BaseSettings):
             "OPENAI_PROMPT_ID_STEP2",
         ),
     )
+    openai_prompt_id_gate2b: str = Field(
+        default="pmpt_698f2e84a3a4819692fe9ba63dacfe53057c8a385232b3fd",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate2b",
+            "OPENAI_PROMPT_ID_GATE2B",
+        ),
+    )
     openai_prompt_id_gate3: str = Field(
-        default="pmpt_6977ec1719a4819591ee668f88df17b909afc5ba96494ebe",
+        default="pmpt_698f31a4830881958384594286c8c62f06c5a37e85bd4e6b",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate3",
             "OPENAI_PROMPT_ID_GATE3",
         ),
     )
     openai_prompt_id_gate4: str = Field(
+        #default="pmpt_6977f448f57881939b6410f0541e5303004454c08c8bc19e",
         default="pmpt_6977f448f57881939b6410f0541e5303004454c08c8bc19e",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate4",
@@ -147,6 +156,17 @@ class AppSettings(BaseSettings):
     # Product options fed to Gate 1 prompt
     product_options: str = (
         "A) R-Blade\nB) R-Breeze\nC) K-Bana\nD) X-Blast\nE) Sky-Tilt\nF) Kitchens"
+    )
+
+    # Dimension context fed to Gate 2 prompt (R-Blade rules)
+    dimension_context: str = (
+        '{"PRODUCT_ID":"r_blade",'
+        '"DIMENSION_RULES":{"r_blade":{'
+        '"rounding_method":"ceil",'
+        '"rounding_increment_ft":1,'
+        '"max_width_single_bay_ft":16,'
+        '"max_length_single_bay_ft":23'
+        '}}}'
     )
 
     @property
