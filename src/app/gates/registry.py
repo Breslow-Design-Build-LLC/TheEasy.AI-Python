@@ -44,6 +44,7 @@ GATE_REGISTRY: dict[int, GateConfig] = {
         variables_template={
             "product_options": "product_id",
             "total_bays": "total_bays",
+            "base_pricing_context": "gate_3_response",
         },
         status=GateStatus.ACTIVE,
     ),
