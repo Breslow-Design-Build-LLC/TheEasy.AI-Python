@@ -21,7 +21,7 @@ class AppSettings(BaseSettings):
     api_key: Optional[str] = None
     openai_api_key: Optional[str] = None
     openai_prompt_id_gate1: str = Field(
-        default="pmpt_6977d1cf2b208195b83507388f431b30072ae8d30040d02c",
+        default="pmpt_698fd0bd177881908e6155c75caf5051054f971f90c1739f",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate1",
             "OPENAI_PROMPT_ID_GATE1",
@@ -53,96 +53,131 @@ class AppSettings(BaseSettings):
             "OPENAI_PROMPT_ID_GATE3",
         ),
     )
+    openai_prompt_id_gate3b: str = Field(
+        default="pmpt_698f91233a908193a38530bfc21a5ea307ff467d4352a6c4",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate3b",
+            "OPENAI_PROMPT_ID_GATE3B",
+        ),
+    )
+    openai_prompt_id_gate3c: str = Field(
+        default="pmpt_698f91f15ed08193bf26b49690cf731a01f60e94ff8b9467",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate3c",
+            "OPENAI_PROMPT_ID_GATE3C",
+        ),
+    )
     openai_prompt_id_gate4: str = Field(
         #default="pmpt_6977f448f57881939b6410f0541e5303004454c08c8bc19e",
-        default="pmpt_6977f448f57881939b6410f0541e5303004454c08c8bc19e",
+        default="pmpt_698f9431c0b08193a0c301c4f992a374057cb68b291d43d1",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate4",
             "OPENAI_PROMPT_ID_GATE4",
         ),
     )
+    openai_prompt_id_gate4b: str = Field(
+        default="pmpt_698f94944ccc81908e741633ae70e04700504d135e320e91",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate4b",
+            "OPENAI_PROMPT_ID_GATE4B",
+        ),
+    )
     openai_prompt_id_gate5: str = Field(
-        default="pmpt_6977f7ad484c819795d265ad1bf07b930402ff510a9eb765",
+        default="pmpt_698f956ab9388194beaaf3c010f9ecba083af44f00bcb344",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate5",
             "OPENAI_PROMPT_ID_GATE5",
         ),
     )
     openai_prompt_id_gate6: str = Field(
-        default="pmpt_697803e1e5e0819587867faccf71fa6409cf1cc966d5e321",
+        default="pmpt_698f96f15f748196bf6c1a302cad209a069bfe999f2a5f54",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate6",
             "OPENAI_PROMPT_ID_GATE6",
         ),
     )
     openai_prompt_id_gate7: str = Field(
-        default="pmpt_697805fb59588196a446eb48e392548109820f5362547ca4",
+        default="pmpt_698fc0af7d8481978eaea4b4f3c04f6106fb16b6264d6bfa",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate7",
             "OPENAI_PROMPT_ID_GATE7",
         ),
     )
     openai_prompt_id_gate8: str = Field(
-        default="pmpt_6978071466bc8190a15ee761a83398410b726c8acef309cc",
+        default="pmpt_698fc169fbac8190be759c4ef225d51e028f54ce31d56012",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate8",
             "OPENAI_PROMPT_ID_GATE8",
         ),
     )
     openai_prompt_id_gate9: str = Field(
-        default="pmpt_697807cb96fc8194b82b82fce26f21bf09a1fc92e4563c30",
+        default="pmpt_698fc57649588193a608068866018bdc0d514a59130d9689",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate9",
             "OPENAI_PROMPT_ID_GATE9",
         ),
     )
     openai_prompt_id_gate10: str = Field(
-        default="pmpt_6978092468cc81958ff5aae5ad2b5b9c0b95329c9d220ede",
+        default="pmpt_698fc653c7888194b612a1cc0552cf510d2785432b170ae1",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate10",
             "OPENAI_PROMPT_ID_GATE10",
         ),
     )
     openai_prompt_id_gate11: str = Field(
-        default="pmpt_697809f6c66081958a4aacfe7e704d3f02d00efa02c8f61b",
+        default="pmpt_698fc808ed68819483779236f399e4780f0556d31b05108f",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate11",
             "OPENAI_PROMPT_ID_GATE11",
         ),
     )
     openai_prompt_id_gate12: str = Field(
-        default="pmpt_69780a90ce6881969d905471a1ad83a505416370ca27f5bb",
+        default="pmpt_698fc8c63dec819795ac20deb6e6dc2e0b0ead22679c7725",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate12",
             "OPENAI_PROMPT_ID_GATE12",
         ),
     )
     openai_prompt_id_gate13: str = Field(
-        default="pmpt_69780bc3d80c819396ff8278323c3193080e758869de286b",
+        default="pmpt_698fc9a974548194ab73dd8b9de548a5041fa6cb9ee62f01",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate13",
             "OPENAI_PROMPT_ID_GATE13",
         ),
     )
     openai_prompt_id_gate14: str = Field(
-        default="pmpt_6978110a94ec8194b17002c5ade3afd70bacd06984cffa57",
+        default="pmpt_698fca776db0819397a781ca4f0cc09e0cbd2cff13cddf3c",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate14",
             "OPENAI_PROMPT_ID_GATE14",
         ),
     )
     openai_prompt_id_gate15: str = Field(
-        default="pmpt_697811b7f65881958e5a4f89b62b705f04088f60550ae728",
+        default="pmpt_698fcae448608196b3a5af34e39543dd0d468eb0783e0095",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate15",
             "OPENAI_PROMPT_ID_GATE15",
         ),
     )
     openai_prompt_id_gate16: str = Field(
-        default="pmpt_6978126bfc1081909f6b9f79fb54a2c802d66271fdf751e6",
+        default="pmpt_698fcc2efed481958d95da57eaf06a4800dd978861a335d5",
         validation_alias=AliasChoices(
             "openai_prompt_id_gate16",
             "OPENAI_PROMPT_ID_GATE16",
+        ),
+    )
+    openai_prompt_id_gate17: str = Field(
+        default="pmpt_698fcd533ee88190a04d275ba6163e1b0a107019ab0c0e6d",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate17",
+            "OPENAI_PROMPT_ID_GATE17",
+        ),
+    )
+    openai_prompt_id_gate18: str = Field(
+        default="pmpt_698fcdd1d558819690b1a1ec882cd2aa0c71bcba13f772ea",
+        validation_alias=AliasChoices(
+            "openai_prompt_id_gate18",
+            "OPENAI_PROMPT_ID_GATE18",
         ),
     )
     openai_prompt_version: str = "5"

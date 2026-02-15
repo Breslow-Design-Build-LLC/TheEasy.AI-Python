@@ -20,6 +20,29 @@ class ErrorResponse(BaseModel):
     error: ErrorDetail
 
 
+# ── Display ────────────────────────────────────────────────────────
+
+class DisplayOption(BaseModel):
+    key: str
+    label: str
+    value: str
+
+
+class DisplayError(BaseModel):
+    code: str
+    message: str
+
+
+class DisplayObject(BaseModel):
+    message: str
+    options: list[DisplayOption] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+    error: Optional[DisplayError] = None
+    gate_number: int = 0
+    gate_name: str = ""
+    status: str = "needs_info"
+
+
 # ── Health ──────────────────────────────────────────────────────────
 
 class HealthResponse(BaseModel):
@@ -80,6 +103,7 @@ class ExternalAPIResponse(BaseModel):
     created_at: str
     gate_number: Optional[int] = None
     gate_name: Optional[str] = None
+    display: Optional[DisplayObject] = None
 
 
 # ── SSE Event Data ──────────────────────────────────────────────────
@@ -99,3 +123,4 @@ class StreamDoneData(BaseModel):
     metadata: Optional[dict[str, Any]] = None
     gate_number: Optional[int] = None
     gate_name: Optional[str] = None
+    display: Optional[DisplayObject] = None

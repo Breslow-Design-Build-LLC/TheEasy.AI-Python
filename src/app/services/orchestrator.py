@@ -67,6 +67,12 @@ class GateOrchestrator:
         for key, value in parsed.items():
             if key not in skip_keys and value is not None:
                 session.product_config[key] = value
+        # Flatten result_single into top-level keys for downstream gates
+        result_single = parsed.get("result_single")
+        if isinstance(result_single, dict):
+            for k, v in result_single.items():
+                if v is not None:
+                    session.product_config[k] = v
         # Store full response as JSON string keyed by gate number
         gate_key = f"gate_{session.current_gate}_response"
         session.product_config[gate_key] = json.dumps(parsed)
@@ -78,7 +84,19 @@ class GateOrchestrator:
         pc = session.product_config
 
         # bay_logic_context — needed by Gate 3 after Gate 17 (Orientation) completes
-        if "width_ft_confirmed" in pc and "length_ft_confirmed" in pc:
+        # Use confirmed dimensions first, fall back to assumed (Gate 2) or option_keep
+        width = (
+            pc.get("width_ft_confirmed")
+            or pc.get("width_ft_assumed")
+            or (pc.get("option_keep", {}).get("width_ft") if isinstance(pc.get("option_keep"), dict) else None)
+        )
+        length = (
+            pc.get("length_ft_confirmed")
+            or pc.get("length_ft_assumed")
+            or (pc.get("option_keep", {}).get("length_ft") if isinstance(pc.get("option_keep"), dict) else None)
+        )
+
+        if width is not None and length is not None:
             dim_rules = json.loads(settings.dimension_context)
             r_blade = dim_rules.get("DIMENSION_RULES", {}).get("r_blade", {})
             bay_logic = {
@@ -87,8 +105,8 @@ class GateOrchestrator:
                 "MAX_BAY_LENGTH_FT": r_blade.get("max_length_single_bay_ft", 23),
                 "INPUT_DIMENSIONS": {
                     "comparison_mode": pc.get("comparison_mode", False),
-                    "width_ft": pc.get("width_ft_confirmed"),
-                    "length_ft": pc.get("length_ft_confirmed"),
+                    "width_ft": width,
+                    "length_ft": length,
                     "option_keep": pc.get("option_keep", {}),
                     "option_swap": pc.get("option_swap", {}),
                 },

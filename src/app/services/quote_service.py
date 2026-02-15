@@ -7,7 +7,11 @@ from typing import Any, AsyncGenerator
 
 from . import conversation_service as conv_svc
 from . import openai_service
+from .display_builder import build_display
 from .orchestrator import orchestrator
+
+# Safety limit to prevent infinite chain-advance loops
+_MAX_CHAIN_ADVANCES = 10
 
 
 def _parse_response_text(text: str) -> dict[str, Any] | None:
@@ -17,6 +21,69 @@ def _parse_response_text(text: str) -> dict[str, Any] | None:
         return json.loads(text)
     except (json.JSONDecodeError, ValueError):
         return None
+
+
+async def _auto_fetch_and_chain(
+    conversation_id: str,
+    session: Any,
+    metadata: dict[str, Any],
+) -> None:
+    """Auto-fetch the next gate's question, chain-advancing through gates that return ok.
+
+    Mutates `metadata` in place, adding `next_gate` or `next_gate_error`.
+    Also persists collected data and session state for each chained gate.
+    """
+    skipped_gates: list[dict[str, Any]] = []
+
+    for _ in range(_MAX_CHAIN_ADVANCES):
+        try:
+            next_gate, next_session = await orchestrator.resolve_gate(conversation_id)
+            next_variables = orchestrator.resolve_variables(next_gate, next_session)
+            next_history = await conv_svc.get_conversation_history(conversation_id)
+            next_response_text = await openai_service.call_prompt(
+                prompt_id=next_gate.prompt_id,
+                messages=next_history,
+                variables=next_variables or None,
+                version=next_gate.prompt_version,
+            )
+            next_parsed = _parse_response_text(next_response_text)
+
+            # If this gate also auto-completes, collect its data and advance
+            if orchestrator.should_advance(next_parsed):
+                skipped_gates.append({
+                    "gate_number": next_gate.number,
+                    "gate_name": next_gate.name,
+                    "status": next_parsed.get("status") if next_parsed else None,
+                })
+                new_num = await orchestrator.advance_gate(
+                    conversation_id, next_session, next_parsed,
+                )
+                metadata["advanced_to_gate"] = new_num
+                if new_num is None:
+                    # No more gates — use last auto-completed gate as next_gate
+                    metadata["next_gate"] = {
+                        "gate_number": next_gate.number,
+                        "gate_name": next_gate.name,
+                        "response": next_parsed or next_response_text,
+                    }
+                    break
+                # Loop continues to fetch the next gate
+                continue
+
+            # Gate has a question — this is where we stop
+            metadata["next_gate"] = {
+                "gate_number": next_gate.number,
+                "gate_name": next_gate.name,
+                "response": next_parsed or next_response_text,
+            }
+            break
+
+        except Exception as e:
+            metadata["next_gate_error"] = str(e)
+            break
+
+    if skipped_gates:
+        metadata["skipped_gates"] = skipped_gates
 
 
 async def handle_message(
@@ -55,28 +122,20 @@ async def handle_message(
         new_gate_num = await orchestrator.advance_gate(conversation_id, session, parsed)
         metadata["advanced_to_gate"] = new_gate_num
 
-        # Auto-fetch the next gate's first question
+        # Auto-fetch with chain-advance
         if new_gate_num is not None:
-            try:
-                next_gate, next_session = await orchestrator.resolve_gate(conversation_id)
-                next_variables = orchestrator.resolve_variables(next_gate, next_session)
-                next_history = await conv_svc.get_conversation_history(conversation_id)
-                next_response_text = await openai_service.call_prompt(
-                    prompt_id=next_gate.prompt_id,
-                    messages=next_history,
-                    variables=next_variables or None,
-                    version=next_gate.prompt_version,
-                )
-                next_parsed = _parse_response_text(next_response_text)
-                metadata["next_gate"] = {
-                    "gate_number": next_gate.number,
-                    "gate_name": next_gate.name,
-                    "response": next_parsed or next_response_text,
-                }
-            except Exception as e:
-                metadata["next_gate_error"] = str(e)
+            await _auto_fetch_and_chain(conversation_id, session, metadata)
     else:
         await orchestrator.save_session(conversation_id, session)
+
+    # Build unified display object
+    display = build_display(
+        parsed=parsed,
+        raw_text=response_text,
+        metadata=metadata,
+        gate_number=gate.number,
+        gate_name=gate.name,
+    )
 
     # Store assistant message
     msg = await conv_svc.add_message(
@@ -86,6 +145,7 @@ async def handle_message(
         response_json=parsed,
         metadata_json=metadata,
     )
+    msg["display"] = display
 
     return msg
 
@@ -131,28 +191,20 @@ async def handle_message_stream(
         new_gate_num = await orchestrator.advance_gate(conversation_id, session, parsed)
         metadata["advanced_to_gate"] = new_gate_num
 
-        # Auto-fetch the next gate's first question
+        # Auto-fetch with chain-advance
         if new_gate_num is not None:
-            try:
-                next_gate, next_session = await orchestrator.resolve_gate(conversation_id)
-                next_variables = orchestrator.resolve_variables(next_gate, next_session)
-                next_history = await conv_svc.get_conversation_history(conversation_id)
-                next_response_text = await openai_service.call_prompt(
-                    prompt_id=next_gate.prompt_id,
-                    messages=next_history,
-                    variables=next_variables or None,
-                    version=next_gate.prompt_version,
-                )
-                next_parsed = _parse_response_text(next_response_text)
-                metadata["next_gate"] = {
-                    "gate_number": next_gate.number,
-                    "gate_name": next_gate.name,
-                    "response": next_parsed or next_response_text,
-                }
-            except Exception as e:
-                metadata["next_gate_error"] = str(e)
+            await _auto_fetch_and_chain(conversation_id, session, metadata)
     else:
         await orchestrator.save_session(conversation_id, session)
+
+    # Build unified display object
+    display = build_display(
+        parsed=parsed,
+        raw_text=full_text,
+        metadata=metadata,
+        gate_number=gate.number,
+        gate_name=gate.name,
+    )
 
     # Store assistant message
     msg = await conv_svc.add_message(
@@ -162,5 +214,6 @@ async def handle_message_stream(
         response_json=parsed,
         metadata_json=metadata,
     )
+    msg["display"] = display
 
     yield {"type": "done", "message": msg}

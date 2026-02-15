@@ -10,6 +10,7 @@ from sse_starlette.sse import EventSourceResponse
 
 from ..auth import require_bearer_token
 from ..models.schemas import (
+    DisplayObject,
     ExternalAPIResponse,
     MessageListResponse,
     MessageItem,
@@ -19,6 +20,7 @@ from ..models.schemas import (
 )
 from ..services import conversation_service as conv_svc
 from ..services import quote_service
+from ..services.display_builder import build_error_display
 
 router = APIRouter(
     prefix="/api/v1/conversations/{conversation_id}/messages",
@@ -51,10 +53,15 @@ async def send_message(conversation_id: str, body: SendMessageRequest):
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail={"error": {"code": "openai_error", "message": str(exc)}},
+            detail={
+                "error": {"code": "openai_error", "message": str(exc)},
+                "display": build_error_display("openai_error", str(exc)),
+            },
         )
 
     meta = msg.get("metadata") or {}
+    raw_display = msg.get("display")
+    display = DisplayObject(**raw_display) if raw_display else None
     return ExternalAPIResponse(
         conversation_id=conversation_id,
         message_id=msg["id"],
@@ -65,6 +72,7 @@ async def send_message(conversation_id: str, body: SendMessageRequest):
         created_at=msg["created_at"],
         gate_number=meta.get("gate_number"),
         gate_name=meta.get("gate_name"),
+        display=display,
     )
 
 
@@ -115,6 +123,8 @@ async def send_message_stream(conversation_id: str, body: SendMessageRequest):
                 elif event["type"] == "done":
                     msg = event["message"]
                     meta = msg.get("metadata") or {}
+                    raw_display = msg.get("display")
+                    display = DisplayObject(**raw_display) if raw_display else None
                     data = StreamDoneData(
                         conversation_id=conversation_id,
                         message_id=msg["id"],
@@ -123,10 +133,14 @@ async def send_message_stream(conversation_id: str, body: SendMessageRequest):
                         metadata=meta,
                         gate_number=meta.get("gate_number"),
                         gate_name=meta.get("gate_name"),
+                        display=display,
                     )
                     yield {"event": "done", "data": data.model_dump_json()}
         except Exception as exc:
-            error_data = json.dumps({"error": {"code": "openai_error", "message": str(exc)}})
+            error_data = json.dumps({
+                "error": {"code": "openai_error", "message": str(exc)},
+                "display": build_error_display("openai_error", str(exc)),
+            })
             yield {"event": "error", "data": error_data}
 
     return EventSourceResponse(event_generator())

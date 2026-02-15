@@ -42,7 +42,8 @@ GATE_REGISTRY: dict[int, GateConfig] = {
         prompt_id=settings.openai_prompt_id_gate4,
         prompt_version="2",
         variables_template={
-            "bay_logic_context": "bay_logic_context",
+            "product_options": "product_id",
+            "total_bays": "total_bays",
         },
         status=GateStatus.ACTIVE,
     ),
@@ -195,6 +196,28 @@ GATE_REGISTRY: dict[int, GateConfig] = {
     ),
     17: GateConfig(
         number=17,
+        name="Revisions",
+        gate_type=GateType.UNIVERSAL,
+        prompt_id=settings.openai_prompt_id_gate17,
+        variables_template={
+            "product_id": "product_id",
+            "quote_context": "quote_context",
+        },
+        status=GateStatus.ACTIVE,
+    ),
+    18: GateConfig(
+        number=18,
+        name="Post-Quote Handoff & Finalize",
+        gate_type=GateType.UNIVERSAL,
+        prompt_id=settings.openai_prompt_id_gate18,
+        variables_template={
+            "product_id": "product_id",
+            "quote_context": "quote_context",
+        },
+        status=GateStatus.ACTIVE,
+    ),
+    19: GateConfig(
+        number=19,
         name="Orientation Confirmation",
         gate_type=GateType.UNIVERSAL,
         prompt_id=settings.openai_prompt_id_gate2b,
@@ -203,9 +226,40 @@ GATE_REGISTRY: dict[int, GateConfig] = {
         },
         status=GateStatus.ACTIVE,
     ),
+    20: GateConfig(
+        number=20,
+        name="Threshold Advisory",
+        gate_type=GateType.UNIVERSAL,
+        prompt_id=settings.openai_prompt_id_gate3b,
+        variables_template={
+            "threshold_advisory_context": "gate_3_response",
+        },
+        status=GateStatus.ACTIVE,
+    ),
+    21: GateConfig(
+        number=21,
+        name="Dimension Router",
+        gate_type=GateType.UNIVERSAL,
+        prompt_id=settings.openai_prompt_id_gate3c,
+        variables_template={
+            "dimension_router_context": "gate_3_response",
+        },
+        status=GateStatus.ACTIVE,
+    ),
+    22: GateConfig(
+        number=22,
+        name="Structural Add-Ons Package Rules",
+        gate_type=GateType.UNIVERSAL,
+        prompt_id=settings.openai_prompt_id_gate4b,
+        variables_template={
+            "product_id": "product_id",
+            "quote_context": "quote_context",
+        },
+        status=GateStatus.ACTIVE,
+    ),
 }
 
-DEFAULT_GATE_SEQUENCE: list[int] = [1, 2, 17, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+DEFAULT_GATE_SEQUENCE: list[int] = [1, 2, 19, 3, 20, 21, 4, 22, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
 
 
 def get_gate(number: int) -> GateConfig:
