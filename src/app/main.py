@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
+import pathlib
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from .config import settings
 from .database import init_db
-from .routers import conversations, health, messages
+from .routers import conversations, health, messages, messages_v2, messages_v3
 
 
 @asynccontextmanager
@@ -41,6 +43,20 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(conversations.router)
 app.include_router(messages.router)
+app.include_router(messages_v2.router)
+app.include_router(messages_v3.router)
+
+# ── Admin Panel (static files) ─────────────────────────────────────
+
+_ADMIN_DIR = pathlib.Path(__file__).resolve().parent.parent.parent / "admin"
+
+if _ADMIN_DIR.is_dir():
+    @app.get("/admin", include_in_schema=False)
+    async def admin_index():
+        """Serve the A.S.C.E.N.D. admin panel."""
+        return FileResponse(_ADMIN_DIR / "index.html")
+
+    app.mount("/admin", StaticFiles(directory=str(_ADMIN_DIR), html=True), name="admin")
 
 
 # ── Global error handler ────────────────────────────────────────────

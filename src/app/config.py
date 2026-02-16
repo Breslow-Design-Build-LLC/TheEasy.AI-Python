@@ -181,6 +181,20 @@ class AppSettings(BaseSettings):
         ),
     )
     openai_prompt_version: str = "5"
+    openai_model: str = "gpt-4.1"
+
+    # Anthropic (V3 multi-provider support)
+    anthropic_api_key: Optional[str] = None
+
+    # Supabase
+    supabase_url: str = "https://vwxmhrlkylrkcqoxvhij.supabase.co"
+    supabase_key: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3eG1ocmxreWxya2Nxb3h2aGlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEwNTk2MzUsImV4cCI6MjA2NjYzNTYzNX0.6wIW1v1EAvBtuDxF4ZNpg_M2W5CLTrvPXoXDbPXuOF4"
+    supabase_service_key: Optional[str] = None  # Service role key for RLS-protected writes
+
+    # V3 Feature Flags
+    enable_v3: bool = True
+    enable_audit_logging: bool = True
+    enable_compliance_agent: bool = True
 
     # CORS
     cors_origins: str = "http://localhost:3000,http://localhost:3001"
