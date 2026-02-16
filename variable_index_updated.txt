@@ -1,0 +1,476 @@
+Universal Context/Table Object Index (All Models)
+Updated to match implemented code (verified 2026-02-15).
+
+1) Product Selection
+Variable: product_options
+[
+  { "id": "r_blade", "label": "R-Blade" },
+  { "id": "r_shade", "label": "R-Shade" },
+  { "id": "r_breeze", "label": "R-Breeze" },
+  { "id": "k_bana", "label": "K-Bana" }
+]
+
+2) Dimensions + Orientation Risk
+Variable: dimension_context
+{
+  "product_id": "r_blade",
+  "dimension_rules": {
+    "r_blade": { "rounding_method": "ceil", "rounding_increment_ft": 1, "max_width_single_bay_ft": 16, "max_length_single_bay_ft": 23 },
+    "r_shade": { "rounding_method": "ceil", "rounding_increment_ft": 1, "max_width_single_bay_ft": 16, "max_length_single_bay_ft": 23 },
+    "r_breeze": { "rounding_method": "ceil", "rounding_increment_ft": 1, "max_width_single_bay_ft": 23, "max_length_single_bay_ft": 23 }
+  }
+}
+
+3) Orientation Confirmation
+Variable: orientation_context
+{
+  "product_id": "r_blade",
+  "allow_comparison_mode": true,
+  "input_from_s02_1": {
+    "dim_a_ft_rounded": 23,
+    "dim_b_ft_rounded": 16,
+    "bay_count_as_entered": 2,
+    "bay_count_swapped": 1,
+    "width_ft_assumed": 23,
+    "length_ft_assumed": 16,
+    "orientation_review_reasons": []
+  },
+  "max_bay_width_ft": 16,
+  "max_bay_length_ft": 23
+}
+
+4) Threshold Advisory
+Variable: threshold_advisory_context
+{
+  "PRODUCT_ID": "r_blade",
+  "INPUT_FROM_S02_1": {
+    "width_ft_assumed": 17,
+    "length_ft_assumed": 20,
+    "dim_a_ft_decimal": 16.5,
+    "dim_b_ft_decimal": 20,
+    "dim_a_ft_rounded": 17,
+    "dim_b_ft_rounded": 20
+  },
+  "INPUT_FROM_S02_2": {
+    "comparison_mode": false,
+    "orientation_choice": null,
+    "width_ft_confirmed": null,
+    "length_ft_confirmed": null
+  },
+  "LIMITS": {
+    "max_width_single_bay_ft": 16,
+    "max_length_single_bay_ft": 23
+  },
+  "TOLERANCE": {
+    "enabled": true,
+    "max_overage_ft": 1
+  },
+  "INPUT_FROM_S03": {
+    "total_bays": 2,
+    "width_bays": 2,
+    "length_bays": 1
+  }
+}
+
+5) Dimension Router
+Variable: dimension_router_context
+{
+  "PRODUCT_ID": "r_blade",
+  "MAX_BAY_WIDTH_FT": 16,
+  "MAX_BAY_LENGTH_FT": 23,
+  "FROM_S03_1": {
+    "advisory_triggered": true,
+    "user_choice": "adjust",
+    "compare_mode": false,
+    "adjusted_width_ft": 16,
+    "adjusted_length_ft": 20
+  },
+  "FROM_S02_2": {
+    "comparison_mode": false,
+    "width_ft_confirmed": null,
+    "length_ft_confirmed": null,
+    "option_keep": {},
+    "option_swap": {}
+  }
+}
+
+6) Bay Logic + Even Split
+Variable: bay_logic_context
+{
+  "PRODUCT_ID": "r_blade",
+  "MAX_BAY_WIDTH_FT": 16,
+  "MAX_BAY_LENGTH_FT": 23,
+  "INPUT_DIMENSIONS": {
+    "comparison_mode": false,
+    "width_ft": 28,
+    "length_ft": 20,
+    "option_keep": { "width_ft": null, "length_ft": null },
+    "option_swap": { "width_ft": null, "length_ft": null }
+  }
+}
+
+7) Base Pricing (Per-bay SKU lookup + totals)
+Variable: base_pricing_context
+{
+  "product_id": "r_blade",
+  "product_rules": {
+    "r_blade": {
+      "pricing_table": [
+        { "width_ft": 14, "length_ft": 20, "sku": "RB-1420", "unit_price": 10000 }
+      ],
+      "addons": [
+        {
+          "sku": "ADD-BTB",
+          "description": "Beam-to-Beam Cover",
+          "unit_price": 21,
+          "pricing_unit": "per_linear_ft",
+          "qty_formula": "beam_to_beam_cover"
+        },
+        {
+          "sku": "ADD-PTG",
+          "description": "Pass-Through Gutter",
+          "unit_price": 2500,
+          "pricing_unit": "each",
+          "qty_formula": "pass_through_gutter"
+        }
+      ]
+    }
+  },
+  "input_from_s03": {
+    "comparison_mode": false,
+    "result_single": { "width_bays": 2, "length_bays": 1, "total_bays": 2, "bay_width_ft": 14, "bay_length_ft": 20 },
+    "result_keep": null,
+    "result_swap": null
+  }
+}
+
+8) Structural Add-Ons Package Rules
+Variable: structural_addons_context
+{
+  "product_id": "r_blade",
+  "structure_input": {
+    "structure_type": "freestanding",
+    "span_direction_assumption": "width",
+    "requested_post_strategy": "default_min"
+  },
+  "structural_rules": {
+    "clear_span_limits_ft": {
+      "header_beam_required_over_ft": 23,
+      "header_beam_allowed_up_to_ft": 30
+    }
+  },
+  "sku_table": [
+    { "sku": "POST-6.5x12", "description": "6.5x6.5x12 Post", "unit_price": 1200, "pricing_unit": "each" }
+  ],
+  "input_from_s03": {
+    "comparison_mode": false,
+    "result_single": { "width_bays": 2, "length_bays": 1, "total_bays": 2, "bay_width_ft": 14, "bay_length_ft": 20 },
+    "result_keep": null,
+    "result_swap": null
+  }
+}
+
+9) Color / Finish Surcharges
+Variable: finish_surcharge_context
+{
+  "product_id": "r_blade",
+  "surcharge_table": [
+    {
+      "sku": "RB-COLOR-ALL-BLK",
+      "display_name": "All Black",
+      "color": "Black",
+      "applies_to": "Job",
+      "pricing_unit": "per_bay",
+      "value": 800,
+      "notes": "Factory color upgrade for louvers..."
+    },
+    {
+      "sku": "RB-FRM-WOOD-GRAIN",
+      "display_name": "Wood Grain Frame",
+      "color": "Wood Grain",
+      "applies_to": "Job",
+      "pricing_unit": "percent",
+      "value": 30,
+      "notes": "Factory-applied frame finish..."
+    }
+  ],
+  "input_from_s03": {
+    "comparison_mode": false,
+    "result_single": { "total_bays": 2, "bay_width_ft": 14, "bay_length_ft": 20 },
+    "result_keep": null,
+    "result_swap": null
+  },
+  "base_system_total": 20000,
+  "base_system_total_keep": null,
+  "base_system_total_swap": null
+}
+
+10) Lighting & Fans
+Variable: lighting_fans_context
+{
+  "product_id": "r_blade",
+  "menu_items": [
+    { "sku": "LT-STRIP", "display_name": "LED Strip Light", "unit_price": 350, "pricing_unit": "per_bay", "notes": "" },
+    { "sku": "LT-DRIVER", "display_name": "LED Driver/Control Box", "unit_price": 500, "pricing_unit": "each", "notes": "" }
+  ],
+  "fan_beam_options": [
+    { "sku": "FAN-BEAM-STD", "description": "Fan Beam", "unit_price": 800, "pricing_unit": "each" }
+  ],
+  "rules": {
+    "led_strip_requires_driver": true,
+    "ceiling_fan_requires_fan_beam_if_not_in_package": true,
+    "package_includes_fan_beam": true
+  },
+  "input_from_s03": {
+    "comparison_mode": false,
+    "result_single": { "total_bays": 2, "bay_width_ft": 14, "bay_length_ft": 20 },
+    "result_keep": null,
+    "result_swap": null
+  }
+}
+
+11) Heaters
+Variable: heater_context
+{
+  "product_id": "r_blade",
+  "models": [
+    { "sku": "HTR-INF-4K", "display_name": "Infratech Slimline 4kW Recessed", "brand": "Infratech", "unit_price": 1200, "pricing_unit": "each", "notes": "" }
+  ],
+  "heater_beams": [
+    { "sku": "CTRL-AZ-BEAM", "display_name": "Heater Beam", "brand": "Breslow", "unit_price": 600, "pricing_unit": "each", "notes": "" }
+  ],
+  "controls": [
+    { "sku": "CTRL-IF-2", "display_name": "Infratech 2-Zone Control", "brand": "Infratech", "unit_price": 400, "pricing_unit": "each", "notes": "" },
+    { "sku": "CTRL-IF-4", "display_name": "Infratech 4-Zone Control", "brand": "Infratech", "unit_price": 700, "pricing_unit": "each", "notes": "" }
+  ],
+  "rules": {
+    "recessed_requires_heater_beams": true,
+    "beam_ratio_heaters_per_beam": 2,
+    "control_tiers": [
+      { "max_heaters": 2, "sku_suffix": "2" },
+      { "max_heaters": 4, "sku_suffix": "4" }
+    ]
+  },
+  "input_from_s03": {
+    "comparison_mode": false,
+    "result_single": { "total_bays": 2, "bay_width_ft": 14, "bay_length_ft": 20 },
+    "result_keep": null,
+    "result_swap": null
+  }
+}
+
+12) Motorized Shades + Privacy Walls
+Variable: shades_privacy_context
+{
+  "product_id": "r_blade",
+  "shades": {
+    "pricing_table": [
+      { "width_ft": 12, "height_ft": 9, "sku": "SHD-12-9", "unit_price": 3500 }
+    ],
+    "install_price_per_shade": 1000,
+    "rules": {
+      "round_up_to_whole_ft": true
+    }
+  },
+  "privacy_walls": {
+    "pricing_table": [
+      { "width_ft": 12, "height_ft": 7, "sku": "PW-12-7", "unit_price": 2800, "style": "spaced" }
+    ],
+    "surcharges": [
+      { "sku": "PW-STY-NG", "display_name": "Solid Style Surcharge", "color": "", "unit_price": 25, "pricing_unit": "percent", "notes": "" }
+    ],
+    "rules": {
+      "center_support_threshold_width_ft": 10,
+      "round_up_to_whole_ft": true,
+      "solid_surcharge_pct": 25
+    }
+  },
+  "input_from_s03": {
+    "comparison_mode": false,
+    "result_single": { "total_bays": 2, "bay_width_ft": 14, "bay_length_ft": 20 },
+    "result_keep": null,
+    "result_swap": null
+  }
+}
+
+13) Trim / Architectural Upgrades
+Variable: trim_context
+{
+  "product_id": "r_blade",
+  "menu_items": [
+    { "sku": "TR-CORN-2", "display_name": "2-Step Cornice", "unit_price": 55, "pricing_unit": "per_linear_ft" },
+    { "sku": "TR-PKG-STD", "display_name": "Standard Trim Package", "unit_price": 1500, "pricing_unit": "each" }
+  ],
+  "rules": {
+    "max_one_trim_package": true,
+    "external_led_requires_2step_cornice": true
+  },
+  "input_from_s03": {
+    "comparison_mode": false,
+    "result_single": { "total_bays": 2, "bay_width_ft": 14, "bay_length_ft": 20 },
+    "result_keep": null,
+    "result_swap": null
+  }
+}
+
+14) Electrical Scope
+Variable: electrical_scope_context
+{
+  "product_id": "r_blade",
+  "has_heaters": true,
+  "heater_qty": 4,
+  "has_shades": true,
+  "shade_qty": 2,
+  "electrical_menu": [
+    { "name": "Accessory Mounting & Wires (For Electrician)", "unit_price": 2900, "brand": "Breslow Labor" },
+    { "name": "Full Electrical Hook-Up & Mounting", "unit_price": 5500, "brand": "Breslow Labor" },
+    { "name": "Per Heater Upcharge (Full Electric)", "unit_price": 2500, "brand": "Breslow Labor" },
+    { "name": "Sub Panel", "unit_price": 1500, "brand": "Breslow Labor" }
+  ],
+  "input_from_s03": {
+    "comparison_mode": false,
+    "result_single": { "width_bays": 2, "length_bays": 1, "total_bays": 2, "bay_width_ft": 14, "bay_length_ft": 20 },
+    "result_keep": null,
+    "result_swap": null
+  }
+}
+
+15) Installation Scope
+Variable: installation_context
+{
+  "product_id": "r_blade",
+  "install_state": "NJ",
+  "allow_supply_only": false
+}
+
+16) Design / Engineering / Permits
+Variable: services_context
+{
+  "product_id": "r_blade",
+  "allow_custom_service": false
+}
+
+17) Quote Summary
+Variable: quote_summary_context
+{
+  "product_id": "r_blade",
+  "project_state": "NJ",
+  "customer_name": null,
+  "summary_inputs": {
+    "s03_bay_logic": { "...gate 3 response..." },
+    "s04_base_pricing": { "...gate 4 response..." },
+    "s04b_structural": { "...gate 22 response..." },
+    "s05_finish": { "...gate 5 response..." },
+    "s06_lighting_fans": { "...gate 6 response..." },
+    "s07_heaters": { "...gate 7 response..." },
+    "s08_shades_privacy": { "...gate 8 response..." },
+    "s09_trim": { "...gate 9 response..." },
+    "s10_electrical": { "...gate 10 response..." },
+    "s11_installation": { "...gate 11 response..." },
+    "s12_services": { "...gate 12 response..." }
+  }
+}
+
+18) Internal Line-Item Audit
+Variable: audit_context
+{
+  "product_id": "r_blade",
+  "audit_inputs": {
+    "s03_bay_logic": { "...gate 3 response..." },
+    "s04_base_pricing": { "...gate 4 response..." },
+    "s04b_structural": { "...gate 22 response..." },
+    "s05_finish": { "...gate 5 response..." },
+    "s06_lighting_fans": { "...gate 6 response..." },
+    "s07_heaters": { "...gate 7 response..." },
+    "s08_shades_privacy": { "...gate 8 response..." },
+    "s09_trim": { "...gate 9 response..." },
+    "s10_electrical": { "...gate 10 response..." },
+    "s11_installation": { "...gate 11 response..." },
+    "s12_services": { "...gate 12 response..." }
+  },
+  "flags": {
+    "orientation_review_required": false,
+    "comparison_mode": false,
+    "rep_override_required": false,
+    "install_scope": "standard"
+  }
+}
+
+19) Final Output Payload
+Variable: final_payload_context
+{
+  "product_id": "r_blade",
+  "project_state": "NJ",
+  "customer_name": null,
+  "opportunity_id": null,
+  "comparison_mode": false,
+  "orientation_choice": null,
+  "step_outputs": {
+    "s02_dimensions": { "...gate 2 response..." },
+    "s03_bay_logic": { "...gate 3 response..." },
+    "s04_base_pricing": { "...gate 4 response..." },
+    "s04b_structural": { "...gate 22 response..." },
+    "s05_finish": { "...gate 5 response..." },
+    "s06_lighting_fans": { "...gate 6 response..." },
+    "s07_heaters": { "...gate 7 response..." },
+    "s08_shades_privacy": { "...gate 8 response..." },
+    "s09_trim": { "...gate 9 response..." },
+    "s10_electrical": { "...gate 10 response..." },
+    "s11_installation": { "...gate 11 response..." },
+    "s12_services": { "...gate 12 response..." },
+    "s13_summary": { "...gate 13 response..." },
+    "s14_audit": { "...gate 14 response..." }
+  }
+}
+
+20) Detailed Breakdown
+Variable: breakdown_context
+{
+  "product_id": "r_blade",
+  "line_items": [
+    {
+      "section": "Base System",
+      "description": "R-Blade 14x20",
+      "sku": "RB-1420",
+      "qty": 2,
+      "unit_price": 10000,
+      "subtotal": 20000,
+      "is_structural_core": false,
+      "notes": []
+    }
+  ]
+}
+
+21) Revisions Router
+Variable: revision_context
+{
+  "product_id": "r_blade",
+  "allowed_revision_targets": [
+    { "target": "dimensions", "route_to_step": "S02", "label": "Dimensions & State" },
+    { "target": "orientation", "route_to_step": "S02b", "label": "Orientation" },
+    { "target": "bay_logic", "route_to_step": "S03", "label": "Bay Logic" },
+    { "target": "base_pricing", "route_to_step": "S04", "label": "Base Pricing" },
+    { "target": "structural", "route_to_step": "S04b", "label": "Structural Add-Ons" },
+    { "target": "color", "route_to_step": "S05", "label": "Color / Finish" },
+    { "target": "lighting_fans", "route_to_step": "S06", "label": "Lighting & Fans" },
+    { "target": "heaters", "route_to_step": "S07", "label": "Heaters" },
+    { "target": "shades_privacy", "route_to_step": "S08", "label": "Shades & Privacy Walls" },
+    { "target": "trim", "route_to_step": "S09", "label": "Trim & Architectural" },
+    { "target": "electrical", "route_to_step": "S10", "label": "Electrical Scope" },
+    { "target": "installation", "route_to_step": "S11", "label": "Installation Scope" },
+    { "target": "services", "route_to_step": "S12", "label": "Design / Engineering / Permits" }
+  ]
+}
+
+22) Post-Quote Handoff + Finalize
+Variable: handoff_context
+{
+  "product_id": "r_blade",
+  "audit": {
+    "blockers": [],
+    "warnings": [],
+    "confirmations": [],
+    "override_notes": []
+  },
+  "final_status": "ready"
+}
