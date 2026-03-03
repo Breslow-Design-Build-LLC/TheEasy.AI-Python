@@ -2,8 +2,7 @@ import os
 from openai import OpenAI
 import json
 
-client = OpenAI(api_key="REMOVED_SECRET")
-#client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 prompts = {
     'gate1': ('pmpt_698fd0bd177881908e6155c75caf5051054f971f90c1739f', {'product_options': 'A) R-Blade\nB) R-Breeze\nC) K-Bana\nD) X-Blast\nE) Sky-Tilt\nF) Kitchens'}),
